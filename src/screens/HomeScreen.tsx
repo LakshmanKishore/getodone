@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity, Alert, Image } from 'react-native';
 import { ThemedTextInput } from '../components/ThemedTextInput';
 import { ThemedText } from '../components/ThemedText';
 import { ThemedView } from '../components/ThemedView';
@@ -8,6 +8,35 @@ import { Todo } from '../services/types';
 import { getTodos, saveTodos } from '../services/storage';
 import uuid from 'react-native-uuid';
 import { useFocusEffect } from '@react-navigation/native';
+
+const getodoneLogoXml = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" width="160" height="60">
+  <!-- Gradient Definitions -->
+  <defs>
+    <!-- Gradient for "t": Top half amber (o from todo), Bottom half green (ge) -->
+    <linearGradient id="tGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="50%" stop-color="#FFC107" /> <!-- Amber (top half) -->
+      <stop offset="50%" stop-color="#4CAF50" /> <!-- Green (bottom half) -->
+    </linearGradient>
+
+    <!-- Gradient for "do": Top half blue (ne from done), Bottom half amber (o from todo) -->
+    <linearGradient id="doGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="50%" stop-color="#2196F3" /> <!-- Blue (top half) -->
+      <stop offset="50%" stop-color="#FFC107" /> <!-- Amber (bottom half) -->
+    </linearGradient>
+  </defs>
+
+  <!-- Text element with consistent letter spacing -->
+  <text x="10" y="42" font-family="Arial, sans-serif" font-weight="bold" font-size="36" letter-spacing="1" textLength="140">
+    <tspan fill="#4CAF50">g</tspan>
+    <tspan fill="#4CAF50">e</tspan>
+    <tspan fill="url(#tGradient)">t</tspan>
+    <tspan fill="#FFC107">o</tspan>
+    <tspan fill="url(#doGradient)">d</tspan>
+    <tspan fill="url(#doGradient)">o</tspan>
+    <tspan fill="#2196F3">n</tspan>
+    <tspan fill="#2196F3">e</tspan>
+  </text>
+</svg>`;
 
 export default function HomeScreen() {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -57,6 +86,7 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <Image source={require('../assets/images/getodone_logo.png')} style={styles.logo} />
       <ThemedText type="title" style={styles.title}>Your Todos</ThemedText>
       <ThemedView style={styles.inputContainer}>
         <ThemedTextInput
@@ -88,6 +118,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  logo: {
+    alignSelf: 'center',
+    marginBottom: 20,
   },
   title: {
     marginBottom: 20,
