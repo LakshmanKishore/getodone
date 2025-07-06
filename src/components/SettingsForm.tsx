@@ -10,26 +10,41 @@ interface SettingsFormProps {
   initialSettings: Settings;
   onSave: (settings: Settings) => void;
   onTestNotification: () => void;
+  onTriggerBackgroundTask: () => void;
 }
 
-export const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onSave, onTestNotification }) => {
+export const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onSave, onTestNotification, onTriggerBackgroundTask }) => {
   const [notificationFrequency, setNotificationFrequency] = useState(initialSettings.notificationFrequency);
   const [aiTone, setAiTone] = useState(initialSettings.aiTone);
   const [apiKey, setApiKey] = useState(initialSettings.apiKey);
   const [model, setModel] = useState(initialSettings.model);
   const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(initialSettings.notificationsEnabled);
+  const [customTime, setCustomTime] = useState(initialSettings.customNotificationTime || '10:00');
 
-  useEffect(() => {
+  const handleSave = () => {
     onSave({
       notificationFrequency,
       aiTone,
       apiKey,
       model,
+      notificationsEnabled,
+      customNotificationTime: customTime,
     });
-  }, [notificationFrequency, aiTone, apiKey, model]);
+  };
 
   return (
     <ThemedView style={styles.container}>
+      <View style={styles.switchContainer}>
+        <ThemedText style={styles.label}>Enable Motivational Nudges:</ThemedText>
+        <Switch
+          trackColor={{ false: "#767577", true: "#81b0ff" }}
+          thumbColor={notificationsEnabled ? "#f5dd4b" : "#f4f3f4"}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={setNotificationsEnabled}
+          value={notificationsEnabled}
+        />
+      </View>
       <ThemedText style={styles.label}>Notification Frequency:</ThemedText>
       <Picker
         selectedValue={notificationFrequency}
@@ -40,8 +55,21 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onS
         <Picker.Item label="Hourly" value="hourly" />
         <Picker.Item label="3 times a day" value="3-per-day" />
         <Picker.Item label="Daily" value="daily" />
-        <Picker.Item label="Next 5 Mins" value="5-mins" />
+        <Picker.Item label="Next 1 Min" value="1-min" />
+        <Picker.Item label="Custom" value="custom" />
       </Picker>
+
+      {notificationFrequency === 'custom' && (
+        <>
+          <ThemedText style={styles.label}>Custom Notification Time (HH:MM):</ThemedText>
+          <ThemedTextInput
+            style={styles.input}
+            value={customTime}
+            onChangeText={setCustomTime}
+            placeholder="e.g., 14:30"
+          />
+        </>
+      )}
 
       <ThemedText style={styles.label}>AI Tone:</ThemedText>
       <Picker
@@ -79,6 +107,14 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onS
 
       <TouchableOpacity onPress={onTestNotification} style={styles.testButton}>
         <ThemedText style={styles.testButtonText}>Test Motivation Message</ThemedText>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
+        <ThemedText style={styles.saveButtonText}>Save Settings</ThemedText>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={onTriggerBackgroundTask} style={styles.debugButton}>
+        <ThemedText style={styles.debugButtonText}>Trigger Background Task (Debug)</ThemedText>
       </TouchableOpacity>
     </ThemedView>
   );
@@ -129,5 +165,35 @@ const styles = StyleSheet.create({
   testButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  saveButton: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  debugButton: {
+    backgroundColor: '#FFC107',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  debugButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000',
   },
 });

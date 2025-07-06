@@ -9,8 +9,9 @@ import { generateMotivationMessage } from '../services/ai';
 import { scheduleMotivationNotification } from '../services/notifications';
 import { Settings } from '../services/types';
 import { useFocusEffect } from '@react-navigation/native';
-import { registerBackgroundTask, unregisterBackgroundTask } from '../services/scheduler';
+import { registerBackgroundTask, unregisterBackgroundTask, BACKGROUND_TASK_NAME, executeBackgroundTask } from '../services/scheduler';
 import { registerForPushNotificationsAsync } from '../services/notifications';
+import * as Notifications from 'expo-notifications';
 
 export default function SettingsScreen() {
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -26,6 +27,8 @@ export default function SettingsScreen() {
         aiTone: 'neutral',
         apiKey: '',
         model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        notificationsEnabled: false, // Default to disabled
+        customNotificationTime: '10:00',
       });
     }
   }, []);
@@ -33,12 +36,36 @@ export default function SettingsScreen() {
   useFocusEffect(
     useCallback(() => {
       loadSettings();
+
+      const clearPastNotifications = async () => {
+        const scheduledNotifications = await Notifications.getAllScheduledNotificationsAsync();
+        const now = Date.now();
+
+        for (const notification of scheduledNotifications) {
+          if (notification.nextTriggerDate) {
+            const triggerTime = notification.nextTriggerDate;
+            if (triggerTime < now) {
+              console.log(`Cancelling past notification: ${notification.identifier} (Trigger Time: ${new Date(triggerTime).toLocaleTimeString()})`);
+              await Notifications.cancelScheduledNotificationAsync(notification.identifier);
+            }
+          }
+        }
+      };
+      clearPastNotifications();
+
     }, [loadSettings])
   );
 
   useEffect(() => {
     // Register for push notifications when the component mounts
     registerForPushNotificationsAsync();
+
+    // Log background task status on component mount
+    const checkTaskStatus = async () => {
+      const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_TASK_NAME);
+      console.log(`Background task '${BACKGROUND_TASK_NAME}' registered status: ${isRegistered}`);
+    };
+    checkTaskStatus();
   }, []);
 
   const handleSaveSettings = async (newSettings: Settings) => {
@@ -47,8 +74,11 @@ export default function SettingsScreen() {
     Alert.alert('Settings Saved', 'Your settings have been updated.');
 
     // Re-register background task with new settings
-    await unregisterBackgroundTask();
-    await registerBackgroundTask();
+    if (newSettings.notificationsEnabled) {
+      await registerBackgroundTask();
+    } else {
+      await unregisterBackgroundTask();
+    }
   };
 
   const handleTestNotification = useCallback(async () => {
@@ -85,7 +115,7 @@ export default function SettingsScreen() {
 
       if (message) {
         console.log('Scheduling notification...');
-        await scheduleMotivationNotification(message);
+        await scheduleMotivationNotification(message, new Date(Date.now() + 1000)); // 1 second delay for immediate test notification
         console.log('Notification scheduled.');
         Alert.alert('Test Notification Sent', message);
       } else {
@@ -96,6 +126,26 @@ export default function SettingsScreen() {
       console.error('Error testing notification:', error);
       Alert.alert('Error', `Failed to send test notification: ${error.message || 'Unknown error'}. Check your API key and network connection.`);
     }
+  }, []);
+
+  const handleTriggerBackgroundTask = useCallback(async () => {
+    console.log('Manually triggering background task...');
+    const result = await executeBackgroundTask();
+    let alertMessage = '';
+    switch (result) {
+      case 'no-data':
+        alertMessage = 'Background task executed: No new data.';
+        break;
+      case 'new-data':
+        alertMessage = 'Background task executed: New data processed.';
+        break;
+      case 'failed':
+        alertMessage = 'Background task executed: Failed.';
+        break;
+      default:
+        alertMessage = 'Background task executed with unknown result.';
+    }
+    Alert.alert('Background Task Triggered', alertMessage + ' Check console for logs.');
   }, []);
 
   if (!settings) {
@@ -113,6 +163,7 @@ export default function SettingsScreen() {
         initialSettings={settings}
         onSave={handleSaveSettings}
         onTestNotification={handleTestNotification}
+        onTriggerBackgroundTask={handleTriggerBackgroundTask}
       />
     </ThemedView>
   );

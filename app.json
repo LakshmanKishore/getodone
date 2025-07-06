@@ -17,7 +17,10 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.lakshmankishore.getodone"
+      "package": "com.lakshmankishore.getodone",
+      "permissions": [
+        "FOREGROUND_SERVICE"
+      ]
     },
     "web": {
       "bundler": "metro",

@@ -1,7 +1,18 @@
 import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
+import { Platform, AppState } from 'react-native';
 
-export const scheduleMotivationNotification = async (message: string) => {
+// Ensure notifications are shown even when the app is in the foreground
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
+export const scheduleMotivationNotification = async (message: string, triggerDate: Date | number | null) => {
+  console.log(`scheduleMotivationNotification called with message: "${message}" and triggerDate: ${typeof triggerDate === 'number' ? `(delay: ${triggerDate} seconds)` : triggerDate?.toISOString()}`);
   if (Platform.OS === 'web') {
     console.log('Notifications are not fully supported on web. Displaying as alert instead.');
     return;
@@ -22,12 +33,27 @@ export const scheduleMotivationNotification = async (message: string) => {
     });
   }
 
+  if (!triggerDate) {
+    console.log('Notification not scheduled as triggerDate is null.');
+    return;
+  }
+
+  let finalTriggerDate: Date;
+  if (typeof triggerDate === 'number') {
+    finalTriggerDate = new Date(Date.now() + triggerDate * 1000); // Convert seconds to milliseconds
+  } else {
+    finalTriggerDate = triggerDate;
+  }
+
+  const trigger = { type: 'date', date: finalTriggerDate };
+  console.log(`Attempting to schedule notification with trigger: ${JSON.stringify(trigger)}`);
+
   await Notifications.scheduleNotificationAsync({
     content: {
       title: "Getodone Nudge!",
       body: message,
     },
-    trigger: null, // Show immediately
+    trigger, // Use the prepared trigger object
   });
 };
 

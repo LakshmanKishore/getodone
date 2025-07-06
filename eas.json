@@ -12,7 +12,8 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "pre-build": "./pre-build.sh"
     }
   },
   "submit": {

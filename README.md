@@ -238,6 +238,7 @@ While local development is preferred for quick iterations, certain native featur
 *   **Port Conflicts:** "Address already in use" errors are often due to orphaned Metro Bundler processes. Force-stopping the Termux app is the most reliable way to clear them.
 *   **Wireless Debugging Instability:** `adb pair` is crucial for stable wireless debugging from Termux on the same device. Be quick to enter the pairing code!
 *   **Native Feature Testing:** For reliable testing of features like notifications and background tasks, a development build (either via `expo run:android` or EAS Build) is essential. Expo Go has limitations.
+*   **Android Battery Optimizations:** On Android, aggressive battery optimizations can prevent background tasks and scheduled notifications from firing reliably when the app is closed. To ensure consistent notification delivery, you may need to manually disable battery optimization for the Getodone app in your device's settings (e.g., Settings > Apps > Getodone > Battery > Unrestricted).
 *   **Iterative Development:** Even with a development build, UI and JavaScript logic changes are fast. Only native code changes require a new build.
 *   **Gemini CLI's Role:** The Gemini CLI was instrumental in navigating the file system, reading/writing files, and executing shell commands, making the entire debugging and development process within Termux manageable.
 

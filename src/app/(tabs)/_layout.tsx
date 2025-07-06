@@ -41,6 +41,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <MaterialIcons size={28} name="settings" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="foregroundService"
+        options={{
+          title: 'Foreground',
+          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="miscellaneous-services" color={color} />,
+        }}
+      />
     </Tabs>
   );
 }
