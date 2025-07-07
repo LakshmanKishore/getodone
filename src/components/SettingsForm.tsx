@@ -10,10 +10,9 @@ interface SettingsFormProps {
   initialSettings: Settings;
   onSave: (settings: Settings) => void;
   onTestNotification: () => void;
-  onTriggerBackgroundTask: () => void;
 }
 
-export const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onSave, onTestNotification, onTriggerBackgroundTask }) => {
+export const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onSave, onTestNotification }) => {
   const [notificationFrequency, setNotificationFrequency] = useState(initialSettings.notificationFrequency);
   const [aiTone, setAiTone] = useState(initialSettings.aiTone);
   const [apiKey, setApiKey] = useState(initialSettings.apiKey);
@@ -111,10 +110,6 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onS
 
       <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
         <ThemedText style={styles.saveButtonText}>Save Settings</ThemedText>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={onTriggerBackgroundTask} style={styles.debugButton}>
-        <ThemedText style={styles.debugButtonText}>Trigger Background Task (Debug)</ThemedText>
       </TouchableOpacity>
     </ThemedView>
   );

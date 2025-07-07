@@ -4,7 +4,7 @@
     "slug": "getodone",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/images/getodone_logo.png",
+    "icon": "./src/assets/images/icon.png",
     "scheme": "getodone",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,13 +13,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/getodone_logo.png",
+        "foregroundImage": "./src/assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.lakshmankishore.getodone",
       "permissions": [
-        "FOREGROUND_SERVICE"
+        "FOREGROUND_SERVICE",
+        "ACCESS_BACKGROUND_LOCATION"
       ]
     },
     "web": {

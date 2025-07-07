@@ -163,7 +163,6 @@ export default function SettingsScreen() {
         initialSettings={settings}
         onSave={handleSaveSettings}
         onTestNotification={handleTestNotification}
-        onTriggerBackgroundTask={handleTriggerBackgroundTask}
       />
     </ThemedView>
   );

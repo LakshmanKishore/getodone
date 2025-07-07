@@ -2,11 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { ThemedTextInput } from '@/components/ThemedTextInput';
 import { startForegroundService, stopForegroundService, isForegroundServiceRunning } from '@/services/foregroundService';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function ForegroundServiceScreen() {
   const [isRunning, setIsRunning] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('Your custom persistent message here.');
 
   const checkStatus = useCallback(async () => {
     const running = await isForegroundServiceRunning();
@@ -21,9 +23,9 @@ export default function ForegroundServiceScreen() {
 
   const handleStartService = async () => {
     try {
-      await startForegroundService();
+      await startForegroundService(notificationMessage);
       setIsRunning(true);
-      Alert.alert('Service Started', 'Foreground service is now running. A persistent notification should appear.');
+      Alert.alert('Service Started', 'Foreground service is now running with your custom message.');
     } catch (error) {
       console.error('Failed to start foreground service:', error);
       Alert.alert('Error', 'Failed to start foreground service.');
@@ -48,6 +50,14 @@ export default function ForegroundServiceScreen() {
         Status: <ThemedText style={isRunning ? styles.running : styles.stopped}>{isRunning ? 'Running' : 'Stopped'}</ThemedText>
       </ThemedText>
 
+      <ThemedText style={styles.label}>Persistent Notification Message:</ThemedText>
+      <ThemedTextInput
+        style={styles.input}
+        value={notificationMessage}
+        onChangeText={setNotificationMessage}
+        placeholder="Enter message for persistent notification"
+      />
+
       <TouchableOpacity
         onPress={handleStartService}
         style={[styles.button, styles.startButton, isRunning && styles.buttonDisabled]}
@@ -65,7 +75,7 @@ export default function ForegroundServiceScreen() {
       </TouchableOpacity>
 
       <ThemedText style={styles.infoText}>
-        Note: A running foreground service will display a persistent notification to ensure reliable background operation.
+        Note: A running foreground service will display a persistent notification that can only be cleared from within this app.
       </ThemedText>
     </ThemedView>
   );
@@ -92,6 +102,18 @@ const styles = StyleSheet.create({
   stopped: {
     color: 'red',
     fontWeight: 'bold',
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    marginTop: 10,
+  },
+  input: {
+    width: '80%',
+    padding: 10,
+    borderRadius: 5,
+    fontSize: 16,
+    marginBottom: 20,
   },
   button: {
     padding: 15,
