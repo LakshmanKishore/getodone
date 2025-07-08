@@ -36,7 +36,7 @@ class MainActivity : ReactActivity() {
   override fun createReactActivityDelegate(): ReactActivityDelegate {
     return ReactActivityDelegateWrapper(
           this,
-          BuildConfig.IS_NEW_ARCHITECTURE_ENABLED,
+          true, // IS_NEW_ARCHITECTURE_ENABLED is now hardcoded to true in build.gradle
           object : DefaultReactActivityDelegate(
               this,
               mainComponentName,
