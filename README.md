@@ -232,6 +232,56 @@ While local development is preferred for quick iterations, certain native featur
     *   *Note:* Free tier builds can have long queue times.
     *   *Previous Issues:* Initial builds failed due to incorrect image paths in `app.json` and a "Failed to compute project fingerprint" error (resolved by `EAS_SKIP_AUTO_FINGERPRINT=1` environment variable, though this was not needed after `app.json` fixes).
 
+## AAB to APK Conversion Script (`aab_to_apk.sh`)
+
+This project includes a utility script, `aab_to_apk.sh`, designed to convert an Android App Bundle (`.aab` file) into a universal APK. This is particularly useful for local testing and distribution on devices that do not support AABs directly or when you need a single APK for sideloading.
+
+### Usage
+
+To use the script, run it from the project root with the path to your `.aab` file and the desired output directory:
+
+```bash
+sh aab_to_apk.sh <path_to_aab_file> <output_directory>
+```
+
+For example:
+```bash
+sh aab_to_apk.sh application-1557a7dd-5e28-4dd5-b286-260db8fc13f7.aab test.apk
+```
+
+The generated APK will be placed in the specified output directory with the same base name as the AAB file (e.g., `test.apk/application-1557a7dd-5e28-4dd5-b286-260db8fc13f7.apk`).
+
+### Troubleshooting and Solutions
+
+During the development and testing of this script within the Termux environment, several challenges were encountered and resolved:
+
+#### 1. `bundletool.jar` Download Failure
+
+**Problem:** The script attempts to download `bundletool-all-<VERSION>.jar` from Google's GitHub releases. Initially, `curl` failed to download the file due to a `CANNOT LINK EXECUTABLE` error on the Termux system.
+
+**Solution:**
+The script was temporarily modified to skip the download and assume `bundletool.jar` was present. However, the original download logic (which includes a fallback to `wget`) was restored after confirming other issues were resolved. Users should ensure their `curl` and `wget` are functional. If `curl` fails, `wget` will be attempted.
+
+#### 2. `aapt2` Not Found
+
+**Problem:** `bundletool` requires `aapt2` (Android Asset Packaging Tool 2) to generate APKs. Despite `aapt` being installed via `pkg install aapt`, `aapt2` was not found or recognized by `bundletool`. `aapt` and `aapt2` are different versions of the tool.
+
+**Solution:**
+1.  `aapt2` was explicitly installed in Termux:
+    ```bash
+    pkg install aapt2
+    ```
+2.  The `aab_to_apk.sh` script was updated to hardcode the absolute path to the installed `aapt2` executable, as `bundletool` was not correctly resolving it from the system's PATH. The path used is `/data/data/com.termux/files/usr/bin/aapt2`.
+
+#### 3. `universal.apk` Not Found in `.apks` Archive
+
+**Problem:** After `bundletool` successfully generated an `.apks` file, the script failed to find `universal.apk` within the extracted contents. `bundletool` by default generates split APKs optimized for different device configurations, rather than a single universal APK.
+
+**Solution:**
+The `build-apks` command in the `aab_to_apk.sh` script was modified to include the `--mode=universal` flag. This instructs `bundletool` to generate a single, universal APK within the `.apks` archive, which the script can then extract.
+
+---
+
 ## Troubleshooting & Lessons Learned
 
 *   **Persistent Java Errors:** When Gradle struggles to find Java in Termux, hardcoding `JAVACMD` in `android/gradlew` was the most effective solution.

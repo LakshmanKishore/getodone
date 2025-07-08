@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getodone – Get Todo Done with AI Motivation</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%%22 y=%2250%%22 style=%22dominant-baseline:central;text-anchor:middle;font-size:60px;fill:%234CAF50;font-family:sans-serif;%22>G</text></svg>" type="image/svg+xml">
+    <style>
+        :root {
+            --start-green: #4CAF50;
+            --middle-amber: #FFC107;
+            --completion-blue: #2196F3;
+            --text-color: #333;
+            --bg-color: #f9f9f9;
+            --light-gray: #eee;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            flex-grow: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.8em;
+            color: var(--start-green);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .tagline {
+            font-size: 1.4em;
+            color: var(--middle-amber);
+            margin-top: 0;
+            font-weight: 500;
+        }
+
+        section {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background-color: var(--light-gray);
+            border-radius: 8px;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: var(--completion-blue);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--completion-blue);
+            padding-bottom: 0.5rem;
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 1em;
+        }
+
+        .feature-list ul {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .feature-list li {
+            background-color: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .feature-list li:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-list li::before {
+            content: '';
+            display: inline-block;
+            width: 1.2em;
+            height: 1.2em;
+            background-color: var(--start-green);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .download-section {
+            text-align: center;
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .download-button {
+            display: inline-block;
+            background-color: var(--completion-blue);
+            color: #fff;
+            padding: 1.2rem 2.5rem;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        .download-button:hover {
+            background-color: #1976D2; /* Darker shade of blue */
+            transform: translateY(-3px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            background-color: var(--text-color);
+            color: #fff;
+            font-size: 0.9em;
+            border-top: 5px solid var(--start-green);
+        }
+
+        footer a {
+            color: var(--middle-amber);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2em;
+            }
+            .tagline {
+                font-size: 1.2em;
+            }
+            .container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+            .download-button {
+                font-size: 1.3em;
+                padding: 1rem 2rem;
+            }
+            .feature-list ul {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Getodone – Get Todo Done with AI Motivation</h1>
+            <p class="tagline">Your todos, now powered by an AI that actually makes you do them.</p>
+        </header>
+
+        <section class="app-info">
+            <h2>About Getodone</h2>
+            <p>
+                Getodone is a next-level AI-powered todo app that doesn’t just track your tasks — it helps you <strong>get them done</strong>. With built-in LLM-powered motivation, personalized reminders, and user-configurable tone (soft or hard), your productivity just leveled up.
+            </p>
+        </section>
+
+        <section class="feature-list">
+            <h2>Key Features</h2>
+            <ul>
+                <li>✅ Simple todo creation interface</li>
+                <li>AI-based motivational notifications</li>
+                <li>⚙️ User-configurable personality (soft/hard)</li>
+                <li>API key stays local via AsyncStorage</li>
+                <li>LLM-powered personalized nudges</li>
+            </ul>
+        </section>
+
+        <section class="download-section">
+            <h2>Ready to Get Things Done?</h2>
+            <a href="getodone.apk" class="download-button" download>Download APK</a>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Getodone. Built by Lakshman. <a href="https://github.com/lakshmankishore" target="_blank">GitHub</a></p>
+    </footer>
+</body>
+</html>
