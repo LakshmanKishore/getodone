@@ -118,21 +118,13 @@ CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
 
 # Determine the Java command to use to start the JVM.
-if [ -d "/data/data/com.termux/files/usr" ]; then
-  # Use Termux-specific Java path
-  JAVACMD="/data/data/com.termux/files/usr/lib/jvm/java-21-openjdk/bin/java"
-else
-  # Standard Java detection
-  if [ -n "$JAVA_HOME" ] ; then
-    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
-        # IBM's JDK on AIX uses strange locations for the executables
-        JAVACMD="$JAVA_HOME/jre/sh/java"
-    else
-        JAVACMD="$JAVA_HOME/bin/java"
-    fi
-  else
-    JAVACMD=java
-  fi
+# Hardcoding JAVACMD due to persistent Java detection issues in Termux.
+JAVACMD="/data/data/com.termux/files/usr/lib/jvm/java-21-openjdk/bin/java"
+
+if [ ! -x "$JAVACMD" ] ; then
+    die "ERROR: Hardcoded JAVACMD is not an executable: $JAVACMD
+
+Please ensure Java is installed at this path."
 fi
 
 # Increase the maximum file descriptors if we can.
@@ -234,11 +226,4 @@ fi
 # an unmatched quote.
 #
 
-eval "set -- $(
-        printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
-        xargs -n1 |
-        sed ' s~[^-[:alnum:]+,./:=@_]~\\&~g; ' |
-        tr '\n' ' '
-    )" '"$@"'
-
-exec "$JAVACMD" "$@"
+eval "set -- $(        printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |        xargs -n1 |        sed ' s~[^-[:alnum:]+,./:=@_]~\\&~g; ' |        tr '\n' ' '    )" "$@"export JAVA_HOME="/data/data/com.termux/files/usr/lib/jvm/java-21-openjdk"exec "$JAVACMD" "$@"

@@ -168,6 +168,26 @@ Please ensure Java is installed at this path."
     ```
     *Result:* Successfully bypassed the Java detection error.
 
+#### `adb` Architecture Mismatch
+
+This error occurred when `adb` was found, but it was compiled for a different architecture (e.g., `EM_X86_64` instead of `EM_AARCH64`). This happens when `platform-tools` are downloaded from Google's general Linux distribution, which might not be `aarch64` compatible for Termux.
+
+**Solution:**
+1.  Remove any existing `platform-tools` directory from your `android_sdk` installation:
+    ```bash
+    rm -rf ~/android_sdk/platform-tools
+    ```
+2.  Install `android-tools` via Termux's package manager, which provides an `aarch64` compatible `adb`:
+    ```bash
+    pkg install android-tools
+    ```
+3.  Create a symbolic link from the Termux-installed `adb` to where Expo expects it:
+    ```bash
+    mkdir -p ~/android_sdk/platform-tools
+    ln -s /data/data/com.termux/files/usr/bin/adb ~/android_sdk/platform-tools/adb
+    ```
+    *Result:* Resolved the `adb` architecture mismatch error.
+
 #### "Address already in use" (Port 8081)
 
 This error occurred frequently when running `npx expo run:android`, indicating that the Metro Bundler (or another process) was already holding port 8081.
@@ -284,7 +304,7 @@ The `build-apks` command in the `aab_to_apk.sh` script was modified to include t
 
 ## Troubleshooting & Lessons Learned
 
-*   **Persistent Java Errors:** When Gradle struggles to find Java in Termux, hardcoding `JAVACMD` in `android/gradlew` was the most effective solution.
+*   **Persistent Java Errors:** When Gradle struggles to find Java in Termux, hardcoding `JAVACMD` in `android/gradlew` was the most effective solution. Additionally, ensuring `JAVA_HOME` is explicitly set within the `android/gradlew` script itself (e.g., `export JAVA_HOME="/data/data/com.termux/files/usr/lib/jvm/java-21-openjdk"` before `exec "$JAVACMD" "$@"`) can resolve issues where Gradle insists on a specific Java version (like Java 17) despite Java 21 being present and configured.
 *   **Port Conflicts:** "Address already in use" errors are often due to orphaned Metro Bundler processes. Force-stopping the Termux app is the most reliable way to clear them.
 *   **Wireless Debugging Instability:** `adb pair` is crucial for stable wireless debugging from Termux on the same device. Be quick to enter the pairing code!
 *   **Native Feature Testing:** For reliable testing of features like notifications and background tasks, a development build (either via `expo run:android` or EAS Build) is essential. Expo Go has limitations.
@@ -293,3 +313,68 @@ The `build-apks` command in the `aab_to_apk.sh` script was modified to include t
 *   **Gemini CLI's Role:** The Gemini CLI was instrumental in navigating the file system, reading/writing files, and executing shell commands, making the entire debugging and development process within Termux manageable.
 
 ---
+
+## Setting up Android NDK in Termux
+This guide explains how to install the Android SDK Command-Line Tools and the Android NDK in the Termux environment. These are needed for projects using native code, such as some React Native or Android projects.
+### Prerequisites
+* Termux installed from F-Droid (recommended for the latest updates and package availability).
+* An Android device running Android 9 or above for optimal NDK compatibility.
+* Basic knowledge of the Termux environment and Linux commands.
+### Steps
+1.  **Update Termux and Install Essential Packages**
+    ```bash
+    pkg update && pkg upgrade
+    pkg install wget unzip openjdk-21
+    ```
+    Make sure OpenJDK 21 is installed. If there are issues, Termux repositories might use different names, or OpenJDK may need to be installed manually (see previous sections for troubleshooting).
+2.  **Download Android SDK Command-Line Tools**
+    Download the latest command-line tools zip file from the Android Studio website. Right-click on the "Command-line tools only" (Linux) link and copy the URL.
+    In Termux, use `wget` to download it.
+    ```bash
+    wget <copied_url> -O cmdline-tools.zip
+    ```
+    Replace `<copied_url>` with the actual URL.
+3.  **Create SDK Directory Structure and Extract Tools**
+    ```bash
+    # Remove any previous attempts to avoid conflicts
+    rm -rf ~/android_sdk/cmdline-tools
+
+    # Create the necessary directory structure for the SDK
+    mkdir -p ~/android_sdk/cmdline-tools/latest
+
+    # Extract the downloaded zip directly into the 'latest' directory
+    unzip cmdline-tools.zip -d ~/android_sdk/cmdline-tools/latest/
+    ```
+    This ensures the `bin`, `lib`, etc. directories are located under `~/android_sdk/cmdline-tools/latest/cmdline-tools/`, which is the correct structure for `sdkmanager` to function correctly.
+4.  **Set Environment Variables**
+    Add the following lines to the `~/.bashrc` (or `~/.zshrc` if using Zsh) file.
+    ```bash
+    export ANDROID_HOME=$HOME/android_sdk
+    export PATH=$ANDROID_HOME/cmdline-tools/latest/cmdline-tools/bin:$PATH
+    export JAVA_HOME=/data/data/com.termux/files/usr/lib/jvm/java-21 # Adjust if your JDK path differs
+    ```
+    Save the file.
+
+    **Important Note on `local.properties`:**
+    The `android/local.properties` file can override the `ANDROID_HOME` environment variable. If you encounter issues where the build process is not using the correct SDK path, ensure that `android/local.properties` points to your `$HOME/android_sdk` directory:
+    ```properties
+    # android/local.properties
+    sdk.dir=/data/data/com.termux/files/home/android_sdk
+    ```
+    This file might be automatically generated or updated by Android Studio or Expo, so it's crucial to verify its content.
+5.  **Reload the shell configuration:**
+    ```bash
+    source ~/.bashrc  # Or source ~/.zshrc if using Zsh
+    ```
+6.  **Accept Android SDK Licenses**
+    ```bash
+    sdkmanager --sdk_root="$ANDROID_HOME" --licenses
+    ```
+    Review and accept several license agreements. Type `y` and press `Enter` for each to accept.
+7.  **Install the Android NDK**
+    ```bash
+    sdkmanager --sdk_root="$ANDROID_HOME" "ndk;27.1.12297006"
+    ```
+    This downloads and installs the specified NDK version (27.1.12297006) into the SDK directory, at `~/android_sdk/ndk/27.1.12297006`.
+
+The Termux environment is now set up with the necessary Android SDK components and the NDK. The project can now be built
